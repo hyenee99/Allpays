@@ -116,9 +116,9 @@ export default function TransactionSummary() {
   return (
     <div className="bg-[#EAEAEA] rounded-lg p-2">
       {/* 거래 요약 */}
-      <h1 className="text-2xl mb-2">📌이번 달의 거래 요약</h1>
-      <div className="flex items-center  justify-center">
-        <div className="text-xl">
+      <h1 className="text-2xl mb-2 max-md:text-xl">📌이번 달의 거래 요약</h1>
+      <div className="flex items-center justify-center max-md:flex-col max-md:gap-3">
+        <div className="text-xl max-md:text-lg">
           <h1>{month}월</h1>
           <ul className="leading-9">
             <li>
@@ -141,16 +141,18 @@ export default function TransactionSummary() {
         </div>
 
         {/* 총 매출 및 결제 상태 그래프 */}
-        <div className="w-[80%] flex-col">
-          <h1 className="text-center text-xl">이번 달 총 매출</h1>
+        <div className="w-[80%] flex flex-col">
+          <h1 className="text-center text-xl max-md:text-lg">
+            이번 달 총 매출
+          </h1>
           <MonthlyChart data={chartData} />
 
-          <h1 className="text-center text-xl">결제 상태</h1>
-          <div className="flex justify-center items-center">
+          <h1 className="text-center text-xl max-md:text-lg">결제 상태</h1>
+          <div className="flex justify-center items-center max-md:flex-col">
             <StatusPieChart data={pieData} />
 
-            <div className="w-[30%] flex flex-col gap-3 items-center">
-              <h1 className="text-2xl">
+            <div className="w-[30%] flex flex-col gap-3 items-center max-md:w-full max-md:gap-1">
+              <h1 className="text-2xl max-md:text-lg">
                 {transactions.length} 건 중 {successTransaction.length} 건의
                 결제 성공
               </h1>

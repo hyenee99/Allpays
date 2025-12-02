@@ -15,7 +15,7 @@ export default function StatusPieChart({
   data: { name: string; value: number }[];
 }) {
   return (
-    <div className="h-60 w-[60%]">
+    <div className="h-60 w-[60%] max-md:w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
