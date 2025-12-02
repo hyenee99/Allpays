@@ -3,12 +3,15 @@ import axiosInstance from "../api/axios";
 import type { Transaction, TransactionsResponse } from "../types/transaction";
 import MonthlyChart from "./charts/MonthlyChart";
 import StatusPieChart from "./charts/StatusPieChart";
+import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 export default function TransactionSummary() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [statusList, setStatusList] = useState<
     { code: string; description: string }[]
   >([]);
+  const navigate = useNavigate();
   const month = 11; //11월로 설정
 
   useEffect(() => {
@@ -105,6 +108,11 @@ export default function TransactionSummary() {
       .filter((item) => item.value > 0);
   }, [transactions, statusList]);
 
+  // 경로로 이동
+  const handleClick = () => {
+    navigate("/transactions");
+  };
+
   return (
     <div className="bg-[#EAEAEA] rounded-lg p-2">
       {/* 거래 요약 */}
@@ -156,6 +164,7 @@ export default function TransactionSummary() {
                   : 0}
                 %)
               </p>
+              <Button content="거래내역 조회하기" onClick={handleClick} />
             </div>
           </div>
         </div>
