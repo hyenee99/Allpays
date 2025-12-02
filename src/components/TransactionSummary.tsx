@@ -5,12 +5,11 @@ import MonthlyChart from "./charts/MonthlyChart";
 import StatusPieChart from "./charts/StatusPieChart";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+import type { statusProps } from "../types/common";
 
 export default function TransactionSummary() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [statusList, setStatusList] = useState<
-    { code: string; description: string }[]
-  >([]);
+  const [statusList, setStatusList] = useState<statusProps[]>([]);
   const navigate = useNavigate();
   const month = 11; //11월로 설정
 
