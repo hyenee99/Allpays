@@ -2,9 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../api/axios";
 import type { Transaction, TransactionsResponse } from "../types/transaction";
 import MonthlyChart from "./charts/MonthlyChart";
+import StatusPieChart from "./charts/StatusPieChart";
 
 export default function TransactionSummary() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [statusList, setStatusList] = useState<
+    { code: string; description: string }[]
+  >([]);
   const month = 11; //11월로 설정
 
   useEffect(() => {
@@ -20,7 +24,20 @@ export default function TransactionSummary() {
         console.error("거래 내역 조회 실패", err);
       }
     };
+
+    const fetchStatusList = async () => {
+      try {
+        const res = await axiosInstance.get("common/payment-status/all");
+        if (res.data.status === 200) {
+          setStatusList(res.data.data);
+        }
+      } catch (err) {
+        console.error("거래 상태 조회 실패", err);
+      }
+    };
+
     fetchTransactions();
+    fetchStatusList();
   }, []);
 
   // 월이 11월이고, 성공한 거래만 필터링
@@ -45,7 +62,7 @@ export default function TransactionSummary() {
       ? Math.floor(totalAmount / successTransaction.length)
       : 0;
 
-  // 차트 데이터로 변환
+  // 라인 차트 데이터로 변환
   const chartData: { date: string; total: number }[] = useMemo(() => {
     const dailyTotals: Record<string, number> = successTransaction.reduce(
       (acc, tx) => {
@@ -74,8 +91,23 @@ export default function TransactionSummary() {
     return result;
   }, [successTransaction]);
 
+  // 파이 그래프 데이터 변환
+  const pieData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    transactions.forEach((tx) => {
+      counts[tx.status] = (counts[tx.status] ?? 0) + 1;
+    });
+    return statusList
+      .map((status) => ({
+        name: status.description,
+        value: counts[status.code] ?? 0,
+      }))
+      .filter((item) => item.value > 0);
+  }, [transactions, statusList]);
+
   return (
     <div className="bg-[#EAEAEA] rounded-lg p-2">
+      {/* 거래 요약 */}
       <h1 className="text-2xl mb-2">📌이번 달의 거래 요약</h1>
       <div className="flex items-center  justify-center">
         <div className="text-xl">
@@ -100,9 +132,32 @@ export default function TransactionSummary() {
           </ul>
         </div>
 
-        <div className="w-[80%]">
-          <h1 className="text-center">이번 달 총 매출</h1>
+        {/* 총 매출 및 결제 상태 그래프 */}
+        <div className="w-[80%] flex-col">
+          <h1 className="text-center text-xl">이번 달 총 매출</h1>
           <MonthlyChart data={chartData} />
+
+          <h1 className="text-center text-xl">결제 상태</h1>
+          <div className="flex justify-center items-center">
+            <StatusPieChart data={pieData} />
+
+            <div className="w-[30%] flex flex-col gap-3 items-center">
+              <h1 className="text-2xl">
+                {transactions.length} 건 중 {successTransaction.length} 건의
+                결제 성공
+              </h1>
+              <p className="text-[#4F46E5]">
+                (성공률{" "}
+                {transactions.length > 0
+                  ? (
+                      (successTransaction.length / transactions.length) *
+                      100
+                    ).toFixed(1)
+                  : 0}
+                %)
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
