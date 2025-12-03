@@ -3,6 +3,7 @@ import Layout from "./layout/Layout";
 import Mainpage from "./pages/Mainpage";
 import TransactionHistory from "./pages/TransactionHistory";
 import Merchants from "./pages/Merchants";
+import MerhchantsDetail from "./pages/MerchantsDetail";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Mainpage />} />
           <Route path="/transactions" element={<TransactionHistory />} />
           <Route path="/merchants" element={<Merchants />} />
+          <Route path="/merchants/detail" element={<MerhchantsDetail />} />
         </Routes>
       </Layout>
     </BrowserRouter>

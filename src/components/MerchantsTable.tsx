@@ -3,6 +3,7 @@ import type { merchantsList } from "../types/merchants";
 import axiosInstance from "../api/axios";
 import Button from "./Button";
 import type { statusProps } from "../types/common";
+import { useNavigate } from "react-router-dom";
 
 export default function MerchantsTable() {
   const [list, setList] = useState<merchantsList[]>([]);
@@ -11,6 +12,7 @@ export default function MerchantsTable() {
   const [statusSelected, setStatusSelected] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 한 페이지당 10개 보여주기
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchList = async () => {
@@ -39,7 +41,6 @@ export default function MerchantsTable() {
     fetchList();
     fetchMchtStatusList();
   }, [statusSelected, searchText]);
-  console.log(list);
 
   // 필터링된 가맹점
   const filteredMerchantsList = useMemo(() => {
@@ -117,7 +118,15 @@ export default function MerchantsTable() {
         </thead>
         <tbody>
           {currentData.map((item, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
+              onClick={() => {
+                navigate("/merchants/detail", {
+                  state: { code: item.mchtCode },
+                });
+              }}
+            >
               <td className="border p-2">{item.mchtCode}</td>
               <td className="border p-2">{item.mchtName}</td>
               <td className="border p-2">

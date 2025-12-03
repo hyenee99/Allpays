@@ -5,7 +5,7 @@ export interface merchantsList {
   bizType: string;
 }
 
-export interface merchantsDetail {
+export interface merchantsDetailProps {
   mchtCode: string;
   mchtName: string;
   status: string;
