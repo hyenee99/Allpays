@@ -6,8 +6,9 @@ import type { statusProps } from "../types/common";
 
 export default function MerchantsTable() {
   const [list, setList] = useState<merchantsList[]>([]);
-  const [searchText, setSearchText] = useState("");
   const [mchtStatusList, setMchtStatusList] = useState<statusProps[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [statusSelected, setStatusSelected] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 한 페이지당 10개 보여주기
 
@@ -37,19 +38,26 @@ export default function MerchantsTable() {
 
     fetchList();
     fetchMchtStatusList();
-  }, []);
+  }, [statusSelected, searchText]);
   console.log(list);
 
-  // 필터링된 가게
+  // 필터링된 가맹점
   const filteredMerchantsList = useMemo(() => {
-    return list.filter((merchant) => {
-      const text = searchText.toLowerCase();
-      return (
-        merchant.mchtCode.toLowerCase().includes(text) ||
-        merchant.mchtName.includes(text)
-      );
-    });
-  }, [list, searchText]);
+    return list
+      .filter((merchant) => {
+        if (statusSelected) {
+          return merchant.status === statusSelected;
+        }
+        return true;
+      })
+      .filter((merchant) => {
+        const text = searchText.toLowerCase();
+        return (
+          merchant.mchtCode.toLowerCase().includes(text) ||
+          merchant.mchtName.includes(text)
+        );
+      });
+  }, [list, statusSelected, searchText]);
 
   // 표시할 데이터 계산하기
   const totalPages = Math.ceil(filteredMerchantsList.length / itemsPerPage);
@@ -69,6 +77,21 @@ export default function MerchantsTable() {
     <>
       <div className="p-2 w-full flex flex-col">
         <div className="flex justify-end gap-3 max-md:flex-col">
+          {/* 가맹점 상태 선택 */}
+          <select
+            className="border rounded-md w-40 h-10 text-center cursor-pointer"
+            value={statusSelected}
+            onChange={(e) => setStatusSelected(e.target.value)}
+          >
+            <option value="">가맹점 상태</option>
+            {mchtStatusList.map((item) => (
+              <option key={item.code} value={item.code}>
+                {item.description}
+              </option>
+            ))}
+          </select>
+
+          {/* 검색창 */}
           <input
             type="text"
             className="border rounded-md w-70 h-10 p-2"
