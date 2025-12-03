@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../api/axios";
 import type { Transaction, TransactionsResponse } from "../types/transaction";
 import MonthlyChart from "./charts/MonthlyChart";
-import StatusPieChart from "./charts/StatusPieChart";
+import StatusPieChart from "./charts/PieChart";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import type { statusProps } from "../types/common";

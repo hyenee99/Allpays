@@ -4,6 +4,7 @@ import HistoryTable from "../components/HistoryTable";
 import type { Transaction, TransactionsResponse } from "../types/transaction";
 import axiosInstance from "../api/axios";
 import type { typeProps } from "../types/common";
+import StatusPieChart from "../components/charts/PieChart";
 
 export default function TransactionHistory() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -38,7 +39,7 @@ export default function TransactionHistory() {
     fetchTypeList();
   }, []);
 
-  // 바 그래프 타입 변환
+  // 바 그래프 타입 변환 (결제 수단별 통계)
   const barData = useMemo(() => {
     const counts: Record<string, number> = {};
     transactions.forEach((tx) => {
@@ -55,11 +56,32 @@ export default function TransactionHistory() {
       .filter((item) => item.percentage > 0);
   }, [transactions, typeList]);
 
+  // 파이 그래프 타입 변환 (통화별 통계)
+  const pieData = useMemo(() => {
+    const counts: Record<string, number> = {};
+
+    transactions.forEach((tx) => {
+      counts[tx.currency] = (counts[tx.currency] ?? 0) + 1;
+    });
+
+    return Object.entries(counts).map(([currency, count]) => ({
+      name: currency,
+      value: count,
+    }));
+  }, [transactions]);
+
   return (
-    <div className="w-full">
-      <div>
-        <h1 className="text-2xl mb-2">🧾결제 수단별 통계</h1>
-        <PayTypeChart data={barData} />
+    <div className="w-full h-full flex flex-col gap-4">
+      <div className="flex items-center h-[55vh] p-3">
+        <div className="w-[50%] h-full">
+          <h1 className="text-2xl mb-2">💳 결제 수단별 통계</h1>
+          <PayTypeChart data={barData} />
+        </div>
+
+        <div className="w-[50%] h-full">
+          <h1 className="text-2xl mb-2">💲통화별 통계</h1>
+          <StatusPieChart data={pieData} />
+        </div>
       </div>
       <div>
         <h1 className="text-2xl mb-2">🧾전체 거래 내역 조회</h1>

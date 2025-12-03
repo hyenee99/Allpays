@@ -6,8 +6,8 @@ interface payTypeChartProps {
 export default function PayTypeChart({ data }: payTypeChartProps) {
   return (
     <BarChart
-      width={600}
-      height={400}
+      width={500}
+      height={350}
       layout="vertical"
       data={data}
       margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
