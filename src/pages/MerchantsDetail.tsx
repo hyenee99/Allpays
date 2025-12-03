@@ -4,6 +4,7 @@ import axiosInstance from "../api/axios";
 import type { merchantsDetailProps } from "../types/merchants";
 import type { statusProps } from "../types/common";
 import { formatDate } from "../utils/fomatDate";
+import DetailBox from "../components/Detailbox";
 
 export default function MerhchantsDetail() {
   const location = useLocation();
@@ -36,25 +37,33 @@ export default function MerhchantsDetail() {
     };
     fetchDetail();
     fetchMchtStatusList();
-  }, []);
+  }, [mchtCode]);
 
   // 가맹점 상태 코드 매치 함수
   const getStautsDescription = (status: string) => {
     const found = mchtStatusList.find((item) => item.code === status);
     return found ? found.description : status;
   };
+
+  if (!detail) return null;
+  const data = [
+    { title: "가맹점 코드", content: detail.mchtCode },
+    { title: "가맹점명", content: detail.mchtName },
+    { title: "주소", content: detail.address },
+    { title: "사업자번호", content: detail.bizNo },
+    { title: "업종", content: detail.bizType },
+    { title: "이메일", content: detail.email },
+    { title: "전화번호", content: detail.phone },
+    { title: "등록일", content: formatDate(detail.registeredAt) },
+    { title: "업데이트일", content: formatDate(detail.updatedAt) },
+    { title: "상태", content: getStautsDescription(detail.status) },
+  ];
+
   return (
-    <div>
-      <p>주소 {detail?.address}</p>
-      <p>사업자번호 {detail?.bizNo}</p>
-      <p>업종{detail?.bizType}</p>
-      <p>이메일{detail?.email}</p>
-      <p>코드{detail?.mchtCode}</p>
-      <p>가맹점명{detail?.mchtName}</p>
-      <p>전화번호{detail?.phone}</p>
-      <p>등록일{formatDate(detail?.registeredAt ?? "")}</p>
-      <p>업데이트일{formatDate(detail?.updatedAt ?? "")}</p>
-      <p>상태{getStautsDescription(detail?.status ?? "")}</p>
+    <div className="bg-[#EAEAEA] w-[40%] p-2 rounded-xl m-auto flex flex-col justify-center gap-2 shadow-md">
+      {data.map((item, index) => (
+        <DetailBox key={index} title={item.title} content={item.content} />
+      ))}
     </div>
   );
 }
