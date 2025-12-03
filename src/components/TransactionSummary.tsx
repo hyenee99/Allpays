@@ -151,7 +151,7 @@ export default function TransactionSummary() {
             <StatusPieChart data={pieData} />
 
             <div className="w-[30%] flex flex-col gap-3 items-center max-md:w-full max-md:gap-1">
-              <h1 className="text-2xl max-md:text-lg">
+              <h1 className="text-xl max-md:text-lg">
                 {transactions.length} 건 중 {successTransaction.length} 건의
                 결제 성공
               </h1>

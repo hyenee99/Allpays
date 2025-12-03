@@ -23,6 +23,14 @@ export default function Header() {
           >
             거래내역조회
           </li>
+          <li
+            className="hover:font-semibold"
+            onClick={() => {
+              navigate("/merchants");
+            }}
+          >
+            가맹점 관리
+          </li>
         </ul>
       </nav>
     </div>

@@ -71,7 +71,7 @@ export default function TransactionHistory() {
   }, [transactions]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className="w-full h-screen flex flex-col gap-4">
       <div className="flex items-center h-[55vh] p-3">
         <div className="w-[50%] h-full">
           <h1 className="text-2xl mb-2">💳 결제 수단별 통계</h1>

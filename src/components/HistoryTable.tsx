@@ -69,7 +69,6 @@ export default function HistoryTable() {
     fetchTypeList();
   }, [selected, searchText]);
 
-  console.log(transactions);
   // 거래 상태 매치 함수
   const getStatusDescription = (status: string) => {
     const found = statusList.find((item) => item.code === status);
@@ -175,7 +174,7 @@ export default function HistoryTable() {
       </table>
 
       {currentData.length > 0 && (
-        <div className="flex justify-center items-center gap-2 mt-4">
+        <div className="flex justify-center items-center gap-2 mt-4 mb-4">
           <Button
             content="이전"
             width={100}
