@@ -113,7 +113,7 @@ export default function TransactionSummary() {
   };
 
   return (
-    <div className="bg-[#EAEAEA] rounded-lg p-2">
+    <div className="bg-[#EAEAEA] rounded-lg p-3">
       {/* 거래 요약 */}
       <h1 className="text-2xl mb-2 max-md:text-xl">📌이번 달의 거래 요약</h1>
       <div className="flex items-center justify-center max-md:flex-col max-md:gap-3">
