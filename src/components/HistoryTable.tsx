@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Transaction, TransactionsResponse } from "../types/transaction";
 import axiosInstance from "../api/axios";
 import type { statusProps, typeProps } from "../types/common";
+import Button from "./Button";
 
 // 날짜 형식 변환 함수
 function formatDate(dateString: string) {
@@ -23,6 +24,8 @@ export default function HistoryTable() {
   const [typeList, setTypeList] = useState<typeProps[]>([]);
   const [selected, setSelected] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 한 페이지당 10개 보여주기
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -32,6 +35,7 @@ export default function HistoryTable() {
         );
         if (res.data.status === 200) {
           setTransactions(res.data.data);
+          setCurrentPage(1);
         }
       } catch (err) {
         console.error("거래 내역 조회 실패", err);
@@ -63,8 +67,7 @@ export default function HistoryTable() {
     fetchTransactions();
     fetchStatusList();
     fetchTypeList();
-  }, []);
-  console.log(typeList);
+  }, [selected, searchText]);
 
   // 거래 상태 매치 함수
   const getStatusDescription = (status: string) => {
@@ -98,13 +101,21 @@ export default function HistoryTable() {
       });
   }, [transactions, selected, searchText]);
 
+  // 표시할 데이터 계산하기
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const currentData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredTransactions.slice(start, end);
+  }, [filteredTransactions, currentPage]);
+
   return (
     <>
       {/* 필터링 기능  */}
       <div className="mb-3 flex flex-col gap-2 p-2">
         <div className="flex justify-end gap-3">
           <select
-            className="border rounded-md w-40 h-10 text-center"
+            className="border rounded-md w-40 h-10 text-center cursor-pointer"
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
           >
@@ -130,6 +141,7 @@ export default function HistoryTable() {
         </div>
       </div>
 
+      {/* 거래 내역 테이블  */}
       <table className="w-full border rounded-lg overflow-hidden">
         <thead className="bg-[#EAEAEA]">
           <tr>
@@ -143,7 +155,7 @@ export default function HistoryTable() {
           </tr>
         </thead>
         <tbody>
-          {filteredTransactions.map((item, index) => (
+          {currentData.map((item, index) => (
             <tr key={index}>
               <td className="border p-2">{item.paymentCode}</td>
               <td className="border p-2">{item.mchtCode}</td>
@@ -160,6 +172,28 @@ export default function HistoryTable() {
           ))}
         </tbody>
       </table>
+
+      {currentData.length > 0 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <Button
+            content="이전"
+            width={100}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+          />
+
+          <span className="px-2">
+            <span className="font-semibold">{currentPage}</span> / {totalPages}
+          </span>
+
+          <Button
+            content="다음"
+            width={100}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          />
+        </div>
+      )}
     </>
   );
 }
