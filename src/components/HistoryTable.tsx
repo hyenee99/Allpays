@@ -69,6 +69,7 @@ export default function HistoryTable() {
     fetchTypeList();
   }, [selected, searchText]);
 
+  console.log(transactions);
   // 거래 상태 매치 함수
   const getStatusDescription = (status: string) => {
     const found = statusList.find((item) => item.code === status);
@@ -112,8 +113,8 @@ export default function HistoryTable() {
   return (
     <>
       {/* 필터링 기능  */}
-      <div className="mb-3 flex flex-col gap-2 p-2">
-        <div className="flex justify-end gap-3">
+      <div className="p-2 w-full flex flex-col">
+        <div className="flex justify-end gap-3 max-md:flex-col">
           <select
             className="border rounded-md w-40 h-10 text-center cursor-pointer"
             value={selected}
@@ -136,7 +137,7 @@ export default function HistoryTable() {
           />
         </div>
 
-        <div className="font-semibold flex justify-end">
+        <div className="font-semibold flex justify-end max-md:justify-start">
           총 {filteredTransactions.length} 건
         </div>
       </div>
