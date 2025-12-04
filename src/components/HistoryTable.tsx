@@ -4,6 +4,7 @@ import axiosInstance from "../api/axios";
 import type { statusProps, typeProps } from "../types/common";
 import Button from "./Button";
 import { formatDate } from "../utils/fomatDate";
+import { useNavigate } from "react-router-dom";
 
 export default function HistoryTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -13,6 +14,7 @@ export default function HistoryTable() {
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 한 페이지당 10개 보여주기
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -143,7 +145,15 @@ export default function HistoryTable() {
         </thead>
         <tbody>
           {currentData.map((item, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
+              onClick={() => {
+                navigate("/merchants/detail", {
+                  state: { code: item.mchtCode },
+                });
+              }}
+            >
               <td className="border p-2">{item.paymentCode}</td>
               <td className="border p-2">{item.mchtCode}</td>
               <td className="border p-2">

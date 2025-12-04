@@ -4,17 +4,33 @@ import axiosInstance from "../api/axios";
 import Button from "./Button";
 import type { statusProps } from "../types/common";
 import { useNavigate } from "react-router-dom";
+import type { Transaction, TransactionsResponse } from "../types/transaction";
 
 export default function MerchantsTable() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [list, setList] = useState<merchantsList[]>([]);
   const [mchtStatusList, setMchtStatusList] = useState<statusProps[]>([]);
   const [searchText, setSearchText] = useState("");
   const [statusSelected, setStatusSelected] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 한 페이지당 10개 보여주기
+  const month = 11; //11월로 설정
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const res = await axiosInstance.get<TransactionsResponse>(
+          "/payments/list"
+        );
+        if (res.data.status === 200) {
+          setTransactions(res.data.data);
+        }
+      } catch (err) {
+        console.error("거래 내역 조회 실패", err);
+      }
+    };
+
     const fetchList = async () => {
       try {
         const res = await axiosInstance.get("/merchants/list");
@@ -38,9 +54,33 @@ export default function MerchantsTable() {
       }
     };
 
+    fetchTransactions();
     fetchList();
     fetchMchtStatusList();
   }, [statusSelected, searchText]);
+
+  // 월이 11월이고, 성공한 거래만 필터링
+  const successTransaction = useMemo(
+    () =>
+      transactions.filter((tx) => {
+        const date = new Date(tx.paymentAt);
+        const txMonth = date.getMonth() + 1;
+        return tx.status === "SUCCESS" && txMonth == month;
+      }),
+    [transactions, month]
+  );
+
+  // 가맹점별 매출 저장
+  const salesData = useMemo(() => {
+    const totals = successTransaction.reduce((acc, tx) => {
+      const key = tx.mchtCode;
+      const amount = parseInt(tx.amount);
+      acc[key] = (acc[key] ?? 0) + amount;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return totals;
+  }, [successTransaction]);
 
   // 필터링된 가맹점
   const filteredMerchantsList = useMemo(() => {
@@ -114,27 +154,33 @@ export default function MerchantsTable() {
             <th className="border p-2">가맹점명</th>
             <th className="border p-2">상태</th>
             <th className="border p-2">업종</th>
+            <th className="border p-2">매출</th>
           </tr>
         </thead>
         <tbody>
-          {currentData.map((item, index) => (
-            <tr
-              key={index}
-              className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
-              onClick={() => {
-                navigate("/merchants/detail", {
-                  state: { code: item.mchtCode },
-                });
-              }}
-            >
-              <td className="border p-2">{item.mchtCode}</td>
-              <td className="border p-2">{item.mchtName}</td>
-              <td className="border p-2">
-                {getStautsDescription(item.status)}
-              </td>
-              <td className="border p-2">{item.bizType}</td>
-            </tr>
-          ))}
+          {currentData.map((item, index) => {
+            const sales = salesData[item.mchtCode] ?? 0;
+
+            return (
+              <tr
+                key={index}
+                className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
+                onClick={() => {
+                  navigate("/merchants/detail", {
+                    state: { code: item.mchtCode },
+                  });
+                }}
+              >
+                <td className="border p-2">{item.mchtCode}</td>
+                <td className="border p-2">{item.mchtName}</td>
+                <td className="border p-2">
+                  {getStautsDescription(item.status)}
+                </td>
+                <td className="border p-2">{item.bizType}</td>
+                <td className="border p-2">{sales.toLocaleString()}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
