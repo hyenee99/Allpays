@@ -197,7 +197,7 @@ export default function MerchantsTable() {
                 className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
                 onClick={() => {
                   navigate("/merchants/detail", {
-                    state: { code: item.mchtCode, sales: item.sales },
+                    state: { code: item.mchtCode },
                   });
                 }}
               >
