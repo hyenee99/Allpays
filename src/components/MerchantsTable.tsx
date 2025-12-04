@@ -13,6 +13,7 @@ export default function MerchantsTable() {
   const [searchText, setSearchText] = useState("");
   const [statusSelected, setStatusSelected] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBySales, setSortBySales] = useState("");
   const itemsPerPage = 10; // 한 페이지당 10개 보여주기
   const month = 11; //11월로 설정
   const navigate = useNavigate();
@@ -100,13 +101,32 @@ export default function MerchantsTable() {
       });
   }, [list, statusSelected, searchText]);
 
+  // 필터링된 리스트에 매출액 붙이기
+  const merchantsWithSales = useMemo(() => {
+    return filteredMerchantsList.map((m) => ({
+      ...m,
+      sales: salesData[m.mchtCode] ?? 0,
+    }));
+  }, [filteredMerchantsList, salesData]);
+
+  // 정렬 옵션 적용
+  const sortedList = useMemo(() => {
+    if (sortBySales === "asc") {
+      return [...merchantsWithSales].sort((a, b) => a.sales - b.sales);
+    }
+    if (sortBySales === "desc") {
+      return [...merchantsWithSales].sort((a, b) => b.sales - a.sales);
+    }
+    return merchantsWithSales;
+  }, [merchantsWithSales, sortBySales]);
+
   // 표시할 데이터 계산하기
-  const totalPages = Math.ceil(filteredMerchantsList.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedList.length / itemsPerPage);
   const currentData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    return filteredMerchantsList.slice(start, end);
-  }, [filteredMerchantsList, currentPage]);
+    return sortedList.slice(start, end);
+  }, [sortedList, currentPage]);
 
   // 가맹점 상태 코드 매치 함수
   const getStautsDescription = (status: string) => {
@@ -130,6 +150,16 @@ export default function MerchantsTable() {
                 {item.description}
               </option>
             ))}
+          </select>
+
+          <select
+            className="border rounded-md w-40 h-10 text-center cursor-pointer"
+            value={sortBySales}
+            onChange={(e) => setSortBySales(e.target.value)}
+          >
+            <option value="">정렬 없음</option>
+            <option value="asc">매출 낮은순</option>
+            <option value="desc">매출 높은순</option>
           </select>
 
           {/* 검색창 */}
@@ -167,7 +197,7 @@ export default function MerchantsTable() {
                 className="hover:bg-[#EAEAEA] cursor-pointer hover:font-semibold"
                 onClick={() => {
                   navigate("/merchants/detail", {
-                    state: { code: item.mchtCode },
+                    state: { code: item.mchtCode, sales: item.sales },
                   });
                 }}
               >
