@@ -10,6 +10,7 @@ export default function MerhchantsDetail() {
   const location = useLocation();
   const state = location.state;
   const mchtCode = state.code;
+  const sales = state.sales;
   const [detail, setDetail] = useState<merchantsDetailProps>();
   const [mchtStatusList, setMchtStatusList] = useState<statusProps[]>([]);
 
@@ -57,6 +58,7 @@ export default function MerhchantsDetail() {
     { title: "등록일", content: formatDate(detail.registeredAt) },
     { title: "업데이트일", content: formatDate(detail.updatedAt) },
     { title: "상태", content: getStautsDescription(detail.status) },
+    { title: "매출", content: sales.toLocaleString() },
   ];
 
   return (
